@@ -8,7 +8,11 @@ import (
 
 func main() {
 	b, _ := storage.New("web-dir")
-	b.UploadFile("../go.mod", "mnml-file")
+	err := b.UploadFile("../go.mod", "mnml-file")
+	if err != nil {
+		fmt.Println("error", err)
+		return
+	}
 	r, err := b.GetString("mnml-file")
 	if err != nil {
 		fmt.Println(err)
