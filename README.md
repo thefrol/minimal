@@ -17,6 +17,8 @@ fmt.Println(r)
 Для начала подтребуется настройка aws, нужно ввести переменные окружения MNML_KEY, MNML_SECRET, а далее все просто:
 
 ```
+import "github.com/thefrol/minimal/storage""
+
 // Поключаемся к бакету по имени my-bucket
 b, _ := storage.New("my-bucket")
 
