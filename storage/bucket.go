@@ -51,10 +51,7 @@ func (b Bucket) GetReader(objectKey string) (io.ReadCloser, error) {
 		Bucket: aws.String(b.Name),
 		Key:    aws.String(objectKey),
 	})
-	if err != nil {
-		return nil, err
-	}
-	return o.Body, nil
+	return o.Body, err
 }
 
 // Возвращает содержимое файла objectkey, передает слайс байт
@@ -65,19 +62,12 @@ func (b Bucket) Get(objectKey string) ([]byte, error) {
 	}
 
 	buf, err := io.ReadAll(r)
-	if err != nil {
-		return nil, err
-	}
-
-	return buf, nil
+	return buf, err
 }
 
 // Возвращает содержимое файла objectkey, передает строку
 func (b Bucket) GetString(objectKey string) (string, error) {
 	buf, err := b.Get(objectKey)
-	if err != nil {
-		return "", err
-	}
 	return string(buf), err
 }
 
