@@ -2,9 +2,7 @@ package storage
 
 import (
 	"context"
-	"fmt"
 	"io"
-	"log"
 	"os"
 	"time"
 
@@ -34,19 +32,16 @@ func New(name string) (*Bucket, error) {
 func (b Bucket) UploadFile(fileName string, objectKey string) error {
 	file, err := os.Open(fileName)
 	if err != nil {
-		log.Printf("Couldn't open file %v to upload. Here's why: %v\n", fileName, err)
-	} else {
-		defer file.Close()
-		_, err = b.s3client.PutObject(context.TODO(), &s3.PutObjectInput{
-			Bucket: aws.String(b.Name),
-			Key:    aws.String(objectKey),
-			Body:   file,
-		})
-		if err != nil {
-			log.Printf("Couldn't upload file %v to %v:%v. Here's why: %v\n",
-				fileName, b.Name, objectKey, err)
-		}
+		return err
 	}
+
+	defer file.Close()
+	_, err = b.s3client.PutObject(context.TODO(), &s3.PutObjectInput{
+		Bucket: aws.String(b.Name),
+		Key:    aws.String(objectKey),
+		Body:   file,
+	})
+
 	return err
 }
 
@@ -57,7 +52,6 @@ func (b Bucket) GetReader(objectKey string) (io.ReadCloser, error) {
 		Key:    aws.String(objectKey),
 	})
 	if err != nil {
-		fmt.Printf("Невозможно получить %v из бакета %v, по причине %+v", objectKey, b.Name, err)
 		return nil, err
 	}
 	return o.Body, nil
@@ -72,7 +66,6 @@ func (b Bucket) Get(objectKey string) ([]byte, error) {
 
 	buf, err := io.ReadAll(r)
 	if err != nil {
-		fmt.Printf("Невозможно получить %v из бакета %v, по причине %+v", objectKey, b.Name, err)
 		return nil, err
 	}
 
@@ -94,7 +87,6 @@ func (b Bucket) Objects() ([]Object, error) {
 		Bucket: aws.String(b.Name),
 	})
 	if err != nil {
-		fmt.Printf("Невозможно получить список файлов %v, по причине %+v", b.Name, err)
 		return nil, err
 	}
 	oo := []Object{}
