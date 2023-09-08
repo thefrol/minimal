@@ -8,12 +8,17 @@ import (
 
 func main() {
 	b, _ := storage.New("web-dir")
-	b.UploadFile("test.go", "mnml-file")
-	r, err := b.GetString("123")
+	b.UploadFile("../go.mod", "mnml-file")
+	r, err := b.GetString("mnml-file")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 	println(r)
+
+	names, _ := b.Names()
+	for _, s := range names {
+		fmt.Println(s)
+	}
 
 }

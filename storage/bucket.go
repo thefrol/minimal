@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -85,4 +86,43 @@ func (b Bucket) GetString(objectKey string) (string, error) {
 		return "", err
 	}
 	return string(buf), err
+}
+
+// Возвращает список ключей бакета
+func (b Bucket) Objects() ([]Object, error) {
+	result, err := b.s3client.ListObjectsV2(context.TODO(), &s3.ListObjectsV2Input{
+		Bucket: aws.String(b.Name),
+	})
+	if err != nil {
+		fmt.Printf("Невозможно получить список файлов %v, по причине %+v", b.Name, err)
+		return nil, err
+	}
+	oo := []Object{}
+	for _, o := range result.Contents {
+		oo = append(oo, Object{
+			Key:  *o.Key,
+			Size: o.Size,
+			Date: *o.LastModified,
+		})
+	}
+	return oo, nil
+}
+
+// Names возвращает слайс имен объктов в бакете
+func (b Bucket) Names() ([]string, error) {
+	objects, err := b.Objects()
+	if err != nil {
+		return nil, err
+	}
+	sl := []string{}
+	for _, o := range objects {
+		sl = append(sl, o.Key)
+	}
+	return sl, nil
+}
+
+type Object struct {
+	Key  string
+	Size int64
+	Date time.Time
 }
