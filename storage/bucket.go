@@ -83,8 +83,14 @@ func (b Bucket) GetBytes(objectKey string) ([]byte, error) {
 
 // Возвращает содержимое файла objectkey, передает строку
 func (b Bucket) GetString(objectKey string) (string, error) {
-	buf, err := b.GetBytes(objectKey)
-	return string(buf), err
+	r, err := b.Get(objectKey)
+	if err != nil {
+		return "", err
+	}
+
+	buf := new(strings.Builder)
+	_, err = io.Copy(buf, r)
+	return buf.String(), err
 }
 
 // Возвращает список ключей бакета
