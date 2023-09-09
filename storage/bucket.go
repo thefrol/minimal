@@ -2,12 +2,15 @@ package storage
 
 import (
 	"context"
+	"errors"
 	"io"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/thefrol/minimal/internal/amazon"
 )
 
@@ -57,6 +60,13 @@ func (b Bucket) Get(objectKey string) (io.ReadCloser, error) {
 		Bucket: aws.String(b.Name),
 		Key:    aws.String(objectKey),
 	})
+	if err != nil {
+		var nsk *types.NoSuchKey
+		if errors.As(err, &nsk) {
+			return nil, KeyNotFound(err)
+		}
+		return nil, err
+	}
 	return o.Body, err
 }
 
