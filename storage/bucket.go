@@ -29,24 +29,30 @@ func New(name string) (*Bucket, error) {
 }
 
 // UploadFIle загружает файл в бакет. objectkey - ключ объкта в бакете
-func (b Bucket) UploadFile(fileName string, objectKey string) error {
-	file, err := os.Open(fileName)
-	if err != nil {
-		return err
-	}
-
-	defer file.Close()
-	_, err = b.s3client.PutObject(context.TODO(), &s3.PutObjectInput{
+func (b Bucket) Put(r io.Reader, objectKey string) error {
+	_, err := b.s3client.PutObject(context.TODO(), &s3.PutObjectInput{
 		Bucket: aws.String(b.Name),
 		Key:    aws.String(objectKey),
-		Body:   file,
+		Body:   r,
 	})
 
 	return err
 }
 
+// UploadFIle загружает файл в бакет. objectkey - ключ объкта в бакете
+func (b Bucket) UploadFile(fileName string, objectKey string) error {
+	file, err := os.Open(fileName)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	err = b.Put(file, objectKey)
+	return err
+}
+
 // Возвращает содержимое файла objectkey. передает поток, который требует закрытия
-func (b Bucket) GetReader(objectKey string) (io.ReadCloser, error) {
+func (b Bucket) Get(objectKey string) (io.ReadCloser, error) {
 	o, err := b.s3client.GetObject(context.TODO(), &s3.GetObjectInput{
 		Bucket: aws.String(b.Name),
 		Key:    aws.String(objectKey),
@@ -55,8 +61,8 @@ func (b Bucket) GetReader(objectKey string) (io.ReadCloser, error) {
 }
 
 // Возвращает содержимое файла objectkey, передает слайс байт
-func (b Bucket) Get(objectKey string) ([]byte, error) {
-	r, err := b.GetReader(objectKey)
+func (b Bucket) GetBytes(objectKey string) ([]byte, error) {
+	r, err := b.Get(objectKey)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +73,7 @@ func (b Bucket) Get(objectKey string) ([]byte, error) {
 
 // Возвращает содержимое файла objectkey, передает строку
 func (b Bucket) GetString(objectKey string) (string, error) {
-	buf, err := b.Get(objectKey)
+	buf, err := b.GetBytes(objectKey)
 	return string(buf), err
 }
 
