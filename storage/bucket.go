@@ -65,7 +65,7 @@ func (b Bucket) Get(objectKey string) (io.ReadCloser, error) {
 	if err != nil {
 		var nsk *types.NoSuchKey
 		if errors.As(err, &nsk) {
-			return nil, KeyNotFound{BucketName: b.Name, Key: objectKey, Err: err}
+			return nil, &KeyNotFound{BucketName: b.Name, Key: objectKey, Err: err}
 		}
 		return nil, err
 	}
