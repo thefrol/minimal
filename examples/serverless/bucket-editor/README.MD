@@ -69,8 +69,6 @@ flowchart TD
   C[( Bucket )] -->   |/view/|B
   B --> |/save/|C[( Bucket )]
   B <--> |/edit/|C[( Bucket )]
-
-click C "/tree/master/bucket"
 ```
 
 ## Что дальше?
