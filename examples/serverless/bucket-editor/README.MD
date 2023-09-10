@@ -66,7 +66,7 @@
 ```mermaid
 flowchart TD
   A[Api Gateway] --> B{Functions}
-  B <-- |/view/|C[( Bucket )]
+  C[( Bucket )] -->   |/view/|B
   B --> |/save/|C[( Bucket )]
   B <--> |/edit/|C[( Bucket )]
 
