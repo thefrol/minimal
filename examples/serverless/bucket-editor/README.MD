@@ -13,7 +13,7 @@
 
 ### Настроим все это. 8 минут
 
-1. Загрузите все файлы в вашу функцию(например, архивом) (Для простоты загрузки можете воспользоваться [powershell скриптом](https://github.com/thefrol/powershell-yandexcloud-function-uploader))
+1. Загрузите все файлы в вашу функцию(например, [архивом](https://minhaskamal.github.io/DownGit/#/home)) (Для простоты загрузки можете воспользоваться [powershell скриптом](https://github.com/thefrol/powershell-yandexcloud-function-uploader))
 1. Создайте сервисный аккаунт с ролью `storage.editor`
   - создайте статичный ключ
   - в переменные окружения функции введите `MNML_KEY` и `MNML` - ключ и секрет полученные в окне
