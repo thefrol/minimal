@@ -26,3 +26,5 @@ require (
 	github.com/caarlos0/env/v9 v9.0.0 // indirect
 	github.com/thefrol/minimal v0.0.0-20230910005156-3ecbe3630934
 )
+
+replace github.com/thefrol/minimal => ../../..

@@ -12,14 +12,14 @@ import (
 	"strings"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/thefrol/minimal/storage"
+	"github.com/thefrol/minimal/bucket"
 )
 
 var Router = chi.NewRouter()
 
 const editorHTML = "./web/edit.html"
 
-var bucket, _ = storage.New("web-dir")
+var bct, _ = bucket.WithName("web-dir")
 
 func init() {
 	Router.Handle("/view/*", http.StripPrefix("/view", http.HandlerFunc(viewHandler)))
@@ -35,7 +35,7 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 
 func viewHandler(w http.ResponseWriter, r *http.Request) {
 	url := strings.TrimLeft(r.URL.Path, "/")
-	rr, err := bucket.Get(url)
+	rr, err := bct.Get(url)
 	if err != nil {
 		http.NotFound(w, r)
 		return
@@ -48,13 +48,13 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
 
 	buttonText := "Сохранить" // текст, который будет написан на кнопке
 
-	t, err := bucket.GetString(key)
-	var nf *storage.KeyNotFound
+	t, err := bct.GetString(key)
+	var nf *bucket.KeyNotFound
 	if errors.As(err, &nf) {
 		println("Создаем новый файл ", key)
 		buttonText = "Создать"
 	} else if err != nil {
-		fmt.Printf("Ошибка получения файла %v из бакета %v, причина: %v\n", key, bucket.Name, err)
+		fmt.Printf("Ошибка получения файла %v из бакета %v, причина: %v\n", key, bct.Name, err)
 		return
 	}
 
@@ -84,9 +84,9 @@ func saveHandler(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	//Запишем в бакет
-	err := bucket.Put(r.Body, key)
+	err := bct.Put(r.Body, key)
 	if err != nil {
-		fmt.Printf("Не удалось загрузить %v в бакет %v по причине: %+v \n", "", bucket.Name, err)
+		fmt.Printf("Не удалось загрузить %v в бакет %v по причине: %+v \n", "", bct.Name, err)
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
 	}

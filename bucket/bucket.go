@@ -1,4 +1,4 @@
-package storage
+package bucket
 
 import (
 	"context"
@@ -11,26 +11,12 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
-	"github.com/thefrol/minimal/internal/amazon"
 )
 
 // Bucket позволяет проводит операции над файлами в бакете
 type Bucket struct {
 	s3client *s3.Client
 	Name     string
-}
-
-// Создает новый объект бакета, и дает доступ в бакет с именем name
-func New(name string) (*Bucket, error) {
-	c, err := amazon.Client()
-	if err != nil {
-		return nil, err
-	}
-	b := Bucket{
-		s3client: c,
-		Name:     name,
-	}
-	return &b, nil
 }
 
 // UploadFIle загружает файл в бакет. objectkey - ключ объкта в бакете
