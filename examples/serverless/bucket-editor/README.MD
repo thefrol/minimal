@@ -70,7 +70,7 @@ flowchart TD
   B --> |/save/|C[( Bucket )]
   B <--> |/edit/|C[( Bucket )]
 
-click C "https://github.com/thefrol/minimal/tree/master/bucket"
+click C "/tree/master/bucket"
 ```
 
 ## Что дальше?
