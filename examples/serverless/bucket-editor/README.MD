@@ -61,6 +61,18 @@
 + `/view/ваш файл` тут можно посмотреть файл
 + `/edit/файл` а тут отредатировать, или создать новый файл, если ввести адрес ещё не существющего файла, например, `https://118ajlsdasd.apigw.yandexcloud.net/edit/new_file.txt`, папки не поддержвиваются
 
+## Архитектура
+
+```mermaid
+flowchart TD
+  A[Api Gateway] --> B{Functions}
+  B <-- |/view/|C[( Bucket )]
+  B --> |/save/|C[( Bucket )]
+  B <--> |/edit/|C[( Bucket )]
+
+click C "https://github.com/thefrol/minimal/tree/master/bucket"
+```
+
 ## Что дальше?
 
 Форкните на гитхабе и установите себе локально репозиторий, чтобы можно было работать с кодом. 
