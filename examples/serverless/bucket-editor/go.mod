@@ -24,7 +24,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sts v1.21.5 // indirect
 	github.com/aws/smithy-go v1.14.2 // indirect
 	github.com/caarlos0/env/v9 v9.0.0 // indirect
-	github.com/thefrol/minimal v0.0.0-20230910005156-3ecbe3630934
+	github.com/thefrol/minimal v0.0.0-20230910181600-6fbeb9a412a6
 )
 
 replace github.com/thefrol/minimal => ../../..
