@@ -113,6 +113,21 @@ func (b Bucket) Names() ([]string, error) {
 	return sl, nil
 }
 
+// Delete удаляет ключ objectName из бакета
+func (b Bucket) Delete(objectKey string) error {
+	_, err := b.s3client.DeleteObject(context.TODO(), &s3.DeleteObjectInput{
+		Key: &objectKey,
+	})
+	if err != nil {
+		var nsk *types.NoSuchKey
+		if errors.As(err, &nsk) {
+			return &KeyNotFound{BucketName: b.Name, Key: objectKey, Err: err}
+		}
+		return err
+	}
+	return nil
+}
+
 type Object struct {
 	Key  string
 	Size int64
