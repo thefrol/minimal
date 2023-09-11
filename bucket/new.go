@@ -9,8 +9,10 @@ import (
 // New Создает новый объект бакета, и дает доступ в бакет с именем name
 // Ключ и секрет берутся из переменных окружения по умолчанию, все
 // остальное настраивается при помощи func_opts
+//
+// MNML_KEY, MNML_SECRET - переменные окружения с креденшансами
 func New() (*Bucket, error) {
-	c, err := amazon.Client()
+	c, err := amazon.Client(amazon.LoadFromEnv)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +34,7 @@ func WithName(name string) (*Bucket, error) {
 }
 
 // FromEnvironmentVariables Открывает бакет, полностью обусловленный переменными окружения,
-// в том числе и имя бакета тоже берется из
+// в том числе и имя бакета тоже берется из MNML_KEY, MNML_SECRET
 func FromEnvironmentVariables() (*Bucket, error) {
 	return nil, errors.New("функция FromEnvironment Variables пока не воплощена")
 }
