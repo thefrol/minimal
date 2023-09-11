@@ -26,7 +26,7 @@ func WithOptions(funcOpts ...OptionsFunc) (*Bucket, error) {
 			return nil, err
 		}
 	}
-
+	// по хорошему ошибки бы собирать и выводить их только если бакет не создастся
 	if b.Name == "" { //validate name! #todo без подчеркиваний там
 		return nil, fmt.Errorf("пустое имя бакета")
 	}
@@ -40,7 +40,7 @@ func WithOptions(funcOpts ...OptionsFunc) (*Bucket, error) {
 // MNML_KEY, MNML_SECRET - переменные окружения с креденшансами
 // MNML_BUCKET - имя бакета
 func New(name string) (b *Bucket, err error) {
-	b, err = WithOptions(ConfigFromFile(defaultConfigFile), CredentialsFromEnv, NameFromEnv, WithName(name))
+	b, err = WithOptions( /* ConfigFromFile(defaultConfigFile), */ CredentialsFromEnv, NameFromEnv, WithName(name))
 	return
 }
 
