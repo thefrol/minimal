@@ -61,7 +61,7 @@ func (b Bucket) Get(objectKey string) (io.ReadCloser, error) {
 
 // скачивает ключ objectKey из бакета в path
 func (b Bucket) Download(objectKey, path string) error {
-	return fmt.Errorf("Функция Bucket.Download пока не реализована")
+	return fmt.Errorf("функция Bucket.Download пока не реализована")
 }
 
 // Возвращает содержимое файла objectkey, передает слайс байт
