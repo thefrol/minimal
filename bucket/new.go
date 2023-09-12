@@ -9,7 +9,6 @@
 package bucket
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
@@ -77,7 +76,8 @@ func FromEnvironmentVariables() (*Bucket, error) {
 
 // FromKeys Открывает бакет, так что креденшалы задаются в открытом виде
 func FromKeys(key, secret, session, name string) (*Bucket, error) {
-	return nil, errors.New("функция FromFile Variables пока не воплощена")
+	b, err := WithOptions(StaticCredentials(key, secret, session), WithName(name))
+	return b, err
 }
 
 // Опцефункции
