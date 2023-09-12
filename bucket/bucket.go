@@ -20,7 +20,8 @@ type Bucket struct {
 	Name     string
 }
 
-// UploadFIle загружает файл в бакет. objectkey - ключ объкта в бакете
+// Put загружает буфер в бакет. objectkey - ключ объкта в бакете
+// На ключ ограничений почти нет, позволяет загружать чуть ли не в `////arg.txt`
 func (b Bucket) Put(r io.Reader, objectKey string) error {
 	_, err := b.s3client.PutObject(context.TODO(), &s3.PutObjectInput{
 		Bucket: aws.String(b.Name),
@@ -32,6 +33,7 @@ func (b Bucket) Put(r io.Reader, objectKey string) error {
 }
 
 // UploadFIle загружает файл в бакет. objectkey - ключ объкта в бакете
+// На ключ ограничений почти нет, позволяет загружать чуть ли не в `////arg.txt`
 func (b Bucket) UploadFile(fileName string, objectKey string) error {
 	file, err := os.Open(fileName)
 	if err != nil {
