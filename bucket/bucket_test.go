@@ -2,6 +2,8 @@ package bucket
 
 import (
 	"os"
+	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -70,6 +72,69 @@ func TestBucket_UploadFile(t *testing.T) {
 			require.NoError(t, err)
 			assert.Equal(t, uploadContent, s, "Got wrong content")
 
+		})
+	}
+}
+
+func TestBucket_Deletefile(t *testing.T) {
+
+	tests := []struct {
+		name         string
+		created      []string
+		keysToDelete []string
+		left         []string
+		wantErr      bool
+	}{
+		{
+			name:         "simple",
+			created:      []string{testFile},
+			keysToDelete: []string{testFile},
+			left:         []string{},
+			wantErr:      false,
+		},
+		{
+			name:         "not existent key, no error",
+			created:      []string{testFile},
+			keysToDelete: []string{anotherFile},
+			left:         []string{testFile},
+			wantErr:      false,
+		},
+		{
+			name:         "multiple",
+			created:      []string{testFile, anotherFile, "third.file"},
+			keysToDelete: []string{anotherFile, testFile},
+			left:         []string{"third.file"},
+			wantErr:      false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b, err := cleanBucket()
+			require.NoError(t, err)
+
+			for _, f := range tt.created {
+				err := b.Put(strings.NewReader(uploadContent), f)
+				require.NoError(t, err)
+
+			}
+
+			wasError := false
+			for _, f := range tt.keysToDelete {
+				err := b.Delete(f)
+				if tt.wantErr {
+					wasError = true
+				} else {
+					require.NoError(t, err)
+				}
+			}
+
+			if tt.wantErr {
+				assert.True(t, tt.wantErr, wasError, "We expected to have an error here")
+			}
+			actual, err := b.Names()
+			require.NoError(t, err)
+
+			assert.Truef(t, reflect.DeepEqual(tt.left, actual), "Files left in bucket should be %v, but its %v", tt.left, actual)
 		})
 	}
 }
