@@ -3,6 +3,7 @@ package bucket
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -56,6 +57,11 @@ func (b Bucket) Get(objectKey string) (io.ReadCloser, error) {
 		return nil, err
 	}
 	return o.Body, err
+}
+
+// скачивает ключ objectKey из бакета в path
+func (b Bucket) Download(objectKey, path string) error {
+	return fmt.Errorf("Функция Bucket.Download пока не реализована")
 }
 
 // Возвращает содержимое файла objectkey, передает слайс байт
