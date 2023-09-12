@@ -44,6 +44,12 @@ func TestBucket_UploadFile(t *testing.T) {
 			args:        args{fileName: anotherFile, objectKey: testFile},
 			wantErr:     true,
 		},
+		{
+			name:        "fancy key",
+			createdFile: createdFile{fileName: testFile, content: uploadContent},
+			args:        args{fileName: testFile, objectKey: "#$%^&*\\///bad name"},
+			wantErr:     false,
+		},
 		// а попробовать загрузить несуществующий файл?
 	}
 	for _, tt := range tests {
@@ -170,6 +176,13 @@ func TestBucket_Deletefile(t *testing.T) {
 			created:      []string{testFile, anotherFile, "third.file"},
 			keysToDelete: []string{anotherFile, testFile},
 			left:         []string{"third.file"},
+			wantErr:      false,
+		},
+		{
+			name:         "fancy key",
+			created:      []string{},
+			keysToDelete: []string{"/////bad key", testFile},
+			left:         []string{},
 			wantErr:      false,
 		},
 	}
