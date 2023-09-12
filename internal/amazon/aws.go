@@ -14,17 +14,7 @@ import (
 
 // Client создает клиента s3 из креденшалсов, хранящихся в переменных окружения
 // MNML_KEY, MNMAL_SECRET, MNML_SESSION(опционально)
-func Client() (*s3.Client, error) {
-	e := struct {
-		Key     string `env:"MNML_KEY"`
-		Secret  string `env:"MNML_SECRET"`
-		Session string `env:"MNML_SESSION"`
-	}{}
-
-	if err := env.Parse(&e); err != nil {
-		fmt.Printf("%+v\n", err)
-		return nil, err
-	}
+func Client(functOpts ...func(opts *config.LoadOptions) error) (*s3.Client, error) {
 
 	customResolver := aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (aws.Endpoint, error) {
 		return aws.Endpoint{
@@ -35,13 +25,10 @@ func Client() (*s3.Client, error) {
 		}, nil
 	})
 
-	creds := func(cfg *config.LoadOptions) error {
-		cfg.Credentials = credentials.NewStaticCredentialsProvider(e.Key, e.Secret, e.Session)
-		return nil
-	}
+	functOpts = append(functOpts, config.WithEndpointResolverWithOptions(customResolver))
 
 	// Подгружаем конфигрурацию
-	cfg, err := config.LoadDefaultConfig(context.TODO(), creds, config.WithEndpointResolverWithOptions(customResolver))
+	cfg, err := config.LoadDefaultConfig(context.TODO(), functOpts...)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -52,6 +39,40 @@ func Client() (*s3.Client, error) {
 
 	return client, nil
 
+}
+
+// Загружает креденшался из переменных окружения MNML_KEY, MNML_SECRET
+func LoadFromEnv(opts *config.LoadOptions) error {
+	e := struct {
+		Key     string `env:"MNML_KEY"`
+		Secret  string `env:"MNML_SECRET"`
+		Session string `env:"MNML_SESSION"`
+	}{}
+
+	if err := env.Parse(&e); err != nil {
+		fmt.Printf("%+v\n", err)
+		return err
+	}
+
+	opts.Credentials = credentials.NewStaticCredentialsProvider(e.Key, e.Secret, e.Session)
+	return nil
+}
+
+func LoadFromFile(opts *config.LoadOptions) error {
+	/* 	e := struct {
+		Key     string `env:"MNML_KEY"`
+		Secret  string `env:"MNML_SECRET"`
+		Session string `env:"MNML_SESSION"`
+	}{} */
+
+	return fmt.Errorf("Client.LoadFromFile() не воплощена")
+}
+
+func StaticKeys(key, secret, session string) config.LoadOptionsFunc {
+	return func(opts *config.LoadOptions) error {
+		opts.Credentials = credentials.NewStaticCredentialsProvider(key, secret, session)
+		return nil
+	}
 }
 
 // код взяд из официальной документации yandex cloud

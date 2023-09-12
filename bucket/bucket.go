@@ -116,7 +116,8 @@ func (b Bucket) Names() ([]string, error) {
 // Delete удаляет ключ objectName из бакета
 func (b Bucket) Delete(objectKey string) error {
 	_, err := b.s3client.DeleteObject(context.TODO(), &s3.DeleteObjectInput{
-		Key: &objectKey,
+		Bucket: aws.String(b.Name),
+		Key:    aws.String(objectKey),
 	})
 	if err != nil {
 		var nsk *types.NoSuchKey
