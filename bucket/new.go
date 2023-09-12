@@ -11,6 +11,7 @@ package bucket
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/caarlos0/env"
 	"github.com/thefrol/minimal/internal/amazon"
@@ -31,9 +32,10 @@ func WithOptions(funcOpts ...configFunc) (*Bucket, error) {
 		}
 	}
 
+	validate := not(emptyName, nameHasForbiddenSymbols, startsWithDigit)
 	// по хорошему ошибки бы собирать и выводить их только если бакет не создастся
-	if proto.name == "" { //validate name! #todo без подчеркиваний там
-		return nil, fmt.Errorf("пустое имя бакета")
+	if !validate(proto) {
+		return nil, fmt.Errorf("неправильное имя бакета %v", proto.name)
 	}
 
 	c, err := amazon.Client(amazon.StaticKeys(proto.key, proto.secret, ""))
@@ -124,6 +126,53 @@ type protoBucket struct {
 	name   string
 	key    string
 	secret string
+}
+
+// validators
+
+// На имя бакета накладываются следующие ограничения: #todo
+
+// Длина имени должна быть от 3 до 63 символов.
+// Имя может содержать строчные буквы латинского алфавита, цифры, дефисы и точки.
+// Первый и последний символы должны быть буквами или цифрами.
+// Символы справа и слева от точки должны быть буквами или цифрами.
+// Имя не должно иметь вид IP-адреса (например 10.1.3.9).
+
+type validator func(protoBucket) bool
+
+func nameHasForbiddenSymbols(p protoBucket) bool {
+	return strings.ContainsAny(p.name, "_&!@#$%^&*(),[]{}\"':;/\\")
+}
+
+func emptyName(p protoBucket) bool {
+	return p.name == ""
+}
+func startsWithDigit(p protoBucket) bool {
+	firstCharacter := p.name[0:1]
+	r := strings.Contains("0123456789", firstCharacter)
+	return r
+}
+
+func and(validators ...validator) validator {
+	return func(pb protoBucket) bool {
+		for _, v := range validators {
+			if !v(pb) {
+				return false
+			}
+		}
+		return true
+	}
+}
+
+func not(validators ...validator) validator {
+	return func(pb protoBucket) bool {
+		for _, v := range validators {
+			if v(pb) {
+				return false
+			}
+		}
+		return true
+	}
 }
 
 // #todo все эти функции выделить бы в отдельный файл с интерфейсом для AWS клиентировнных штук
