@@ -58,15 +58,13 @@ func LoadFromEnv(opts *config.LoadOptions) error {
 	return nil
 }
 
-func LoadFromFile(opts *config.LoadOptions) error {
-	/* 	e := struct {
-		Key     string `env:"MNML_KEY"`
-		Secret  string `env:"MNML_SECRET"`
-		Session string `env:"MNML_SESSION"`
-	}{} */
-
-	return fmt.Errorf("Client.LoadFromFile() не воплощена")
-}
+// func LoadFromFile(path string) config.LoadOptionsFunc {
+// 	// эта функция видимо отправляется в кредентиалс
+// 	return func(opts *config.LoadOptions) error {
+// 		credentials.Profile.MakeClient()
+// 		return nil
+// 	}
+// }
 
 func StaticKeys(key, secret, session string) config.LoadOptionsFunc {
 	return func(opts *config.LoadOptions) error {
