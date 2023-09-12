@@ -76,6 +76,72 @@ func TestBucket_UploadFile(t *testing.T) {
 	}
 }
 
+func TestBucket_GetString(t *testing.T) {
+	type args struct {
+		objectKey string
+		content   string
+	}
+	tests := []struct {
+		name          string
+		createdFile   args
+		gettedFile    args
+		wantErr       bool
+		concreteError error // if nil any error is good
+	}{
+		{
+			name:          "simple",
+			createdFile:   args{objectKey: testFile, content: uploadContent},
+			gettedFile:    args{objectKey: testFile, content: uploadContent},
+			wantErr:       false,
+			concreteError: nil,
+		},
+		{
+			name:          "no key, specific error #1",
+			createdFile:   args{objectKey: testFile, content: uploadContent},
+			gettedFile:    args{objectKey: anotherFile, content: uploadContent},
+			wantErr:       true,
+			concreteError: &KeyNotFound{},
+		},
+		{
+			name:          "bad key key, any error #2",
+			createdFile:   args{objectKey: testFile, content: uploadContent},
+			gettedFile:    args{objectKey: "///wtf", content: uploadContent},
+			wantErr:       true,
+			concreteError: nil,
+		},
+		{
+			name:          "bad key key, any error #3",
+			createdFile:   args{objectKey: testFile, content: uploadContent},
+			gettedFile:    args{objectKey: "/...#$%^&*wtf", content: uploadContent},
+			wantErr:       true,
+			concreteError: nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b, err := cleanBucket()
+			require.NoError(t, err)
+
+			err = b.Put(strings.NewReader(tt.createdFile.content), tt.createdFile.objectKey)
+			require.NoError(t, err)
+
+			s, err := b.GetString(tt.gettedFile.objectKey)
+			if tt.wantErr {
+				assert.Error(t, err)
+				if tt.concreteError != nil {
+					assert.ErrorAs(t, err, &tt.concreteError)
+				}
+				return
+
+			}
+			require.NoError(t, err)
+
+			assert.Equal(t, tt.createdFile.content, s, "Got wrong content")
+
+		})
+	}
+}
+
 func TestBucket_Deletefile(t *testing.T) {
 
 	tests := []struct {
@@ -190,3 +256,5 @@ func cleanBucket() (*Bucket, error) {
 
 	return b, nil
 }
+
+// #todo все эти функции только бакета не существует
